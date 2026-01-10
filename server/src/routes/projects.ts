@@ -1,5 +1,6 @@
 import express from 'express';
 import { authenticate } from '../middleware/auth';
+import { auditUnauthorizedAccess } from '../middleware/security';
 import {
   createProject,
   getWorkspaceProjects,
@@ -20,6 +21,9 @@ const router = express.Router();
 
 // All routes require authentication
 router.use(authenticate);
+
+// Add audit logging for unauthorized access attempts
+router.use(auditUnauthorizedAccess('project'));
 
 // Project routes
 router.post('/', createProject);

@@ -1,4 +1,5 @@
 import { Request, Response, RequestHandler } from 'express';
+import { emitToWorkspace } from '../socket/realtimeSocket';
 import Workspace from '../models/Workspace';
 import User from '../models/User';
 import Notification from '../models/Notification';
@@ -359,6 +360,9 @@ export const updateWorkspace = async (req: AuthenticatedRequest, res: Response):
       data: workspace
     };
 
+    // [REALTIME] Emit workspace update
+    emitToWorkspace(id as string, 'workspace:updated', workspace);
+
     res.status(200).json(response);
   } catch (error: any) {
     console.error('Update workspace error:', error);
@@ -446,6 +450,13 @@ export const addMember = async (req: AuthenticatedRequest, res: Response): Promi
       message: 'Member added successfully',
       data: workspace
     };
+
+    // [REALTIME] Emit member added
+    // Find the added member object to send
+    const newMember = workspace.members.find(m => (m.user as any)._id.toString() === userId.toString());
+    if (newMember) {
+      emitToWorkspace(id as string, 'workspace:member_added', { workspaceId: id, member: newMember });
+    }
 
     res.status(200).json(response);
   } catch (error: any) {
@@ -542,6 +553,9 @@ export const removeMember = async (req: AuthenticatedRequest, res: Response): Pr
       data: workspace
     };
 
+    // [REALTIME] Emit member removed
+    emitToWorkspace(id as string, 'workspace:member_removed', { workspaceId: id, memberId });
+
     res.status(200).json(response);
   } catch (error: any) {
     console.error('❌ [REMOVE MEMBER] Error:', error);
@@ -585,6 +599,13 @@ export const updateMemberRole = async (req: AuthenticatedRequest, res: Response)
       message: 'Member role updated successfully',
       data: workspace
     };
+
+    // [REALTIME] Emit member updated
+    const targetMemberId = memberId ? memberId.toString() : '';
+    const updatedMember = workspace.members.find(m => (m.user as any)._id.toString() === targetMemberId);
+    if (updatedMember) {
+      emitToWorkspace(id as string, 'workspace:member_updated', { workspaceId: id, member: updatedMember });
+    }
 
     res.status(200).json(response);
   } catch (error: any) {
@@ -769,6 +790,12 @@ export const acceptWorkspaceInvite: RequestHandler = async (req, res) => {
       message: 'Joined workspace successfully',
       data: workspace as any
     };
+
+    // [REALTIME] Emit member added (via join)
+    const newMember = workspace.members.find(m => (m.user as any)._id.toString() === currentUserId.toString());
+    if (newMember) {
+      emitToWorkspace(workspace._id.toString(), 'workspace:member_added', { workspaceId: workspace._id, member: newMember });
+    }
 
     res.status(200).json(response);
   } catch (error: any) {

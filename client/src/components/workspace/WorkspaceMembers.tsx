@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useDock } from '../../context/DockContext';
 import GlassmorphicCard from '../ui/GlassmorphicCard';
+import { useRealtime } from '../../hooks/useRealtime';
 import { ContextAIButton } from '../ai/ContextAIButton';
 import {
   Search,
@@ -76,38 +77,81 @@ const WorkspaceMembers: React.FC = () => {
   const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
 
-  const [members, setMembers] = useState<Member[]>([
-    {
-      _id: state.userProfile._id,
-      name: state.userProfile.fullName,
-      email: state.userProfile.email,
-      role: 'owner',
-      position: 'Workspace Owner',
-      subscription: state.userProfile.subscription,
-      joinedAt: new Date('2024-01-01'),
-      status: 'active'
-    },
-    {
-      _id: '2',
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: 'admin',
-      position: 'Project Manager',
-      subscription: { plan: 'pro' },
-      joinedAt: new Date('2024-02-15'),
-      status: 'active'
-    },
-    {
-      _id: '3',
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      role: 'member',
-      position: 'Frontend Developer',
-      subscription: { plan: 'free' },
-      joinedAt: new Date('2024-03-10'),
-      status: 'active'
+  const { socket, isConnected } = useRealtime();
+
+  const [members, setMembers] = useState<Member[]>([]);
+
+  // Initialize members from current workspace state
+  useEffect(() => {
+    if (currentWorkspace?.members) {
+      const mappedMembers: Member[] = currentWorkspace.members.map((m: any) => ({
+        _id: m.user?._id || m.user,
+        name: m.user?.fullName || m.name || 'Unknown',
+        email: m.user?.email || 'No email',
+        role: m.role || 'member',
+        position: m.user?.position || 'Member',
+        avatar: m.user?.avatarUrl,
+        subscription: m.user?.subscription,
+        joinedAt: new Date(m.joinedAt || Date.now()),
+        status: m.user?.status || 'active'
+      }));
+      setMembers(mappedMembers);
     }
-  ]);
+  }, [currentWorkspace]);
+
+  // Real-time member updates
+  useEffect(() => {
+    if (!socket || !isConnected || !currentWorkspace) return;
+
+    // Listeners
+    const handleMemberAdded = (data: { workspaceId: string, member: any }) => {
+      if (data.workspaceId !== currentWorkspace._id) return;
+
+      const m = data.member;
+      const newMember: Member = {
+        _id: m.user?._id || m.user,
+        name: m.user?.fullName || m.name || 'New Member',
+        email: m.user?.email || 'No email',
+        role: m.role || 'member',
+        position: 'Member',
+        avatar: m.user?.avatarUrl,
+        joinedAt: new Date(),
+        status: 'active'
+      };
+
+      setMembers(prev => {
+        if (prev.find(existing => existing._id === newMember._id)) return prev;
+        return [...prev, newMember];
+      });
+    };
+
+    const handleMemberRemoved = (data: { workspaceId: string, memberId: string }) => {
+      if (data.workspaceId !== currentWorkspace._id) return;
+      setMembers(prev => prev.filter(m => m._id !== data.memberId));
+    };
+
+    const handleMemberUpdated = (data: { workspaceId: string, member: any }) => {
+      if (data.workspaceId !== currentWorkspace._id) return;
+      // Update role in list
+      const updated = data.member;
+      setMembers(prev => prev.map(m => {
+        if (m._id === (updated.user?._id || updated.user)) {
+          return { ...m, role: updated.role };
+        }
+        return m;
+      }));
+    };
+
+    socket.on('workspace:member_added', handleMemberAdded);
+    socket.on('workspace:member_removed', handleMemberRemoved);
+    socket.on('workspace:member_updated', handleMemberUpdated);
+
+    return () => {
+      socket.off('workspace:member_added', handleMemberAdded);
+      socket.off('workspace:member_removed', handleMemberRemoved);
+      socket.off('workspace:member_updated', handleMemberUpdated);
+    };
+  }, [socket, isConnected, currentWorkspace]);
 
   const getRoleBadge = (role: string) => {
     switch (role) {

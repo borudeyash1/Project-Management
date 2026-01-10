@@ -8,6 +8,7 @@ import { AnimatedThemeToggler } from './ui/animated-theme-toggler';
 import { SparklesText } from './ui/sparkles-text';
 import { useTheme } from '../context/ThemeContext';
 import DropdownTransition from './animations/DropdownTransition';
+import { useRealtime } from '../hooks/useRealtime'; // [NEW] Real-time hook
 import {
   Search,
   Bell,
@@ -48,9 +49,50 @@ const Header: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // Fetch notifications count
+  const { socket } = useRealtime(); // [NEW] Real-time hook
+
+  // Real-time notification listener
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('notification:new', (notification) => {
+      console.log('📬 New notification received:', notification);
+
+      // Update unread count
+      setUnreadCount(prev => prev + 1);
+
+      // Dispatch to store if needed
+      // dispatch({ type: 'ADD_NOTIFICATION', payload: notification });
+
+      // Show toast
+      dispatch({
+        type: 'ADD_TOAST',
+        payload: {
+          id: Date.now().toString(),
+          type: 'info',
+          message: notification.title, // Or notification.message for more detail
+          duration: 4000
+        }
+      });
+
+      // Play sound
+      try {
+        const audio = new Audio('/sounds/notification.mp3'); // Ensure this file exists or use a default
+        audio.play().catch(e => console.log('Audio play failed', e));
+      } catch (e) {
+        // Ignore audio errors
+      }
+    });
+
+    return () => {
+      socket.off('notification:new');
+    };
+  }, [socket, dispatch]);
+
+  // Fetch notifications count (keep existing polling as fallback or initial load)
   useEffect(() => {
     const loadNotifications = async () => {
+      // ... existing logic
       try {
         const notifications = await apiService.getNotifications();
         const unread = notifications.filter(n => !n.read).length;

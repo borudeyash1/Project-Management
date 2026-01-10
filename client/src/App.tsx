@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { PlannerProvider } from './context/PlannerContext';
 import { TrackerProvider } from './context/TrackerContext';
 import { DockProvider, useDock } from './context/DockContext';
+import { RealtimeProvider } from './context/RealtimeContext';
 import { HelmetProvider } from 'react-helmet-async';
 import './i18n'; // Initialize i18n
 import Auth from './components/Auth';
@@ -656,20 +657,32 @@ const App: React.FC = () => {
     <HelmetProvider>
       <Router>
         <AppProvider>
-          <ThemeProvider>
-            <StickyNotesProvider>
-              <DockProvider>
-                <PlannerProvider>
-                  <TrackerProvider>
-                    <AppContent />
-                  </TrackerProvider>
-                </PlannerProvider>
-              </DockProvider>
-            </StickyNotesProvider>
-          </ThemeProvider>
+          <AppWithRealtime />
         </AppProvider>
       </Router>
     </HelmetProvider>
+  );
+};
+
+// Wrapper to access token from AppContext
+const AppWithRealtime: React.FC = () => {
+  const { state } = useApp();
+  const token = localStorage.getItem('token') || undefined;
+
+  return (
+    <RealtimeProvider token={token}>
+      <ThemeProvider>
+        <StickyNotesProvider>
+          <DockProvider>
+            <PlannerProvider>
+              <TrackerProvider>
+                <AppContent />
+              </TrackerProvider>
+            </PlannerProvider>
+          </DockProvider>
+        </StickyNotesProvider>
+      </ThemeProvider>
+    </RealtimeProvider>
   );
 };
 

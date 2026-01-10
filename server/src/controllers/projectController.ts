@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { emitToRoom, emitToWorkspace } from '../socket/realtimeSocket';
 import Project from '../models/Project';
 import Workspace from '../models/Workspace';
 import mongoose from 'mongoose';
@@ -206,6 +207,11 @@ export const createProject = async (req: AuthenticatedRequest, res: Response): P
     const calendarService = getCalendarService();
     if (calendarService) {
       await calendarService.createEventFromProject(project);
+    }
+
+    // [REALTIME] Emit to Workspace
+    if (project.workspace) {
+      emitToWorkspace(project.workspace.toString(), 'project:created', project);
     }
 
     // Sartthi Integration: Mail Notification
@@ -525,6 +531,23 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response): P
 
     await project.save();
 
+    // [NEW] Emit real-time update
+    // [NEW] Emit real-time update
+    emitToRoom(`project:${project._id}`, 'project:updated', {
+      projectId: project._id,
+      changes: req.body,
+      updatedBy: userId
+    });
+
+    // [REALTIME] Emit to Workspace
+    if (project.workspace) {
+      emitToWorkspace(project.workspace.toString(), 'project:updated', {
+        projectId: project._id,
+        changes: req.body,
+        updatedBy: userId
+      });
+    }
+
     // Create activity
     await createActivity(
       userId,
@@ -650,6 +673,21 @@ export const deleteProject = async (req: AuthenticatedRequest, res: Response): P
     // Soft delete by setting isActive to false
     project.isActive = false;
     await project.save();
+
+    // [NEW] Emit real-time delete
+    // [NEW] Emit real-time delete
+    emitToRoom(`project:${project._id}`, 'project:deleted', {
+      projectId: project._id,
+      deletedBy: userId
+    });
+
+    // [REALTIME] Emit to Workspace
+    if (project.workspace) {
+      emitToWorkspace(project.workspace.toString(), 'project:deleted', {
+        projectId: project._id,
+        deletedBy: userId
+      });
+    }
 
     res.status(200).json({
       success: true,

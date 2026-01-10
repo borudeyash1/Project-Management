@@ -11,6 +11,7 @@ import { useDock } from '../context/DockContext';
 import { WorkspaceCreationRestriction } from './FeatureRestriction';
 import { useFeatureAccess } from '../hooks/useFeatureAccess';
 import { useRefreshData } from '../hooks/useRefreshData';
+import { useRealtime } from '../hooks/useRealtime';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -61,6 +62,7 @@ const ProjectsPage: React.FC = () => {
   const { dockPosition } = useDock();
   const { canCreateProject } = useFeatureAccess();
   const { isDarkMode } = useTheme();
+  const { socket, isConnected } = useRealtime();
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -103,6 +105,91 @@ const ProjectsPage: React.FC = () => {
     const matchByName = state.workspaces?.find((ws) => ws.name === state.currentWorkspace);
     return matchByName?._id || state.workspaces?.[0]?._id;
   }, [state.mode, state.currentWorkspace, state.workspaces]);
+
+  // Real-time updates
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+
+    // Join workspace room if in workspace mode
+    if (activeWorkspaceId && activeWorkspaceId !== 'personal') {
+      socket.emit('subscribe:workspace', activeWorkspaceId);
+    }
+
+    // Handlers
+    const handleProjectCreated = (newProject: any) => {
+      // Only add if it belongs to current view (workspace or personal)
+      if (activeWorkspaceId === 'personal') {
+        if (newProject.workspace) return; // Ignore workspace projects in personal view
+      } else {
+        if (newProject.workspace !== activeWorkspaceId) return; // Ignore other workspace projects
+      }
+
+      setProjects(prev => {
+        if (prev.find(p => p._id === newProject._id)) return prev;
+
+        // Adapt new project to local Project interface
+        const rawOwner = (newProject as any).createdBy || (newProject as any).owner || {};
+        const rawTeam = (newProject as any).teamMembers || (newProject as any).team || [];
+        const start = newProject.startDate || (newProject as any).startDate || new Date().toISOString();
+        const due = newProject.dueDate || (newProject as any).endDate || new Date().toISOString();
+
+        const adaptedProject: Project = {
+          _id: newProject._id,
+          name: newProject.name,
+          description: newProject.description || 'No description provided',
+          status: (newProject.status as Project['status']) || 'active',
+          priority: (newProject.priority as Project['priority']) || 'medium',
+          progress: newProject.progress ?? 0,
+          startDate: new Date(start),
+          endDate: new Date(due),
+          budget: (newProject as any).budget || { estimated: 0, actual: 0, currency: 'INR' },
+          team: Array.isArray(rawTeam)
+            ? rawTeam.map((member: any) => ({
+              _id: member.user?._id || member._id,
+              name: member.user?.fullName || member.name || 'Member',
+              avatar: member.user?.avatarUrl || member.avatar,
+            }))
+            : [],
+          tags: newProject.tags || [],
+          owner: {
+            _id: rawOwner._id || 'owner',
+            name: rawOwner.fullName || rawOwner.name || 'Owner',
+            avatar: rawOwner.avatarUrl || rawOwner.avatar,
+          },
+          createdAt: new Date(newProject.createdAt),
+          updatedAt: new Date(newProject.updatedAt)
+        };
+
+        return [adaptedProject, ...prev];
+      });
+    };
+
+    const handleProjectUpdated = (data: { projectId: string, changes: any }) => {
+      setProjects(prev => prev.map(p => {
+        if (p._id === data.projectId) {
+          return { ...p, ...data.changes };
+        }
+        return p;
+      }));
+    };
+
+    const handleProjectDeleted = (data: { projectId: string }) => {
+      setProjects(prev => prev.filter(p => p._id !== data.projectId));
+    };
+
+    socket.on('project:created', handleProjectCreated);
+    socket.on('project:updated', handleProjectUpdated);
+    socket.on('project:deleted', handleProjectDeleted);
+
+    return () => {
+      if (activeWorkspaceId && activeWorkspaceId !== 'personal') {
+        socket.emit('unsubscribe:workspace', activeWorkspaceId);
+      }
+      socket.off('project:created', handleProjectCreated);
+      socket.off('project:updated', handleProjectUpdated);
+      socket.off('project:deleted', handleProjectDeleted);
+    };
+  }, [socket, isConnected, activeWorkspaceId]);
 
   const loadProjects = useCallback(async () => {
     try {
@@ -834,76 +921,76 @@ const ProjectsPage: React.FC = () => {
               </button>
             )}
           </div>
-      )}
+        )}
 
-      {/* Complete Confirmation Modal */}
-      {completeConfirmOpen && projectToComplete && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`max-w-md w-full rounded-lg p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Complete Project
-            </h3>
-            <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              To complete this project, please confirm by entering the following:
-            </p>
-            
-            <div className="space-y-4">
-              {/* Project Name Display */}
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Project Name:
-                </label>
-                <div className={`px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}>
-                  {projectToComplete.name}
+        {/* Complete Confirmation Modal */}
+        {completeConfirmOpen && projectToComplete && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className={`max-w-md w-full rounded-lg p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+              <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                Complete Project
+              </h3>
+              <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                To complete this project, please confirm by entering the following:
+              </p>
+
+              <div className="space-y-4">
+                {/* Project Name Display */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Project Name:
+                  </label>
+                  <div className={`px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'}`}>
+                    {projectToComplete.name}
+                  </div>
+                </div>
+
+                {/* Confirmation Input */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Type <span className="font-mono text-green-600">"complete-this-project"</span> to confirm:
+                  </label>
+                  <input
+                    type="text"
+                    value={completeConfirmText}
+                    onChange={(e) => setCompleteConfirmText(e.target.value)}
+                    placeholder="complete-this-project"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent ${isDarkMode
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                      }`}
+                  />
                 </div>
               </div>
 
-              {/* Confirmation Input */}
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Type <span className="font-mono text-green-600">"complete-this-project"</span> to confirm:
-                </label>
-                <input
-                  type="text"
-                  value={completeConfirmText}
-                  onChange={(e) => setCompleteConfirmText(e.target.value)}
-                  placeholder="complete-this-project"
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent ${isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCompleteConfirmOpen(false);
+                    setProjectToComplete(null);
+                    setCompleteConfirmText('');
+                  }}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDarkMode
+                    ? 'text-gray-300 hover:bg-gray-700'
+                    : 'text-gray-600 hover:bg-gray-100'
                     }`}
-                />
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmCompleteProject}
+                  disabled={completeConfirmText !== 'complete-this-project' || processingProjectId === projectToComplete.id}
+                  className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {processingProjectId === projectToComplete.id ? 'Completing...' : 'Complete Project'}
+                </button>
               </div>
             </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setCompleteConfirmOpen(false);
-                  setProjectToComplete(null);
-                  setCompleteConfirmText('');
-                }}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDarkMode
-                  ? 'text-gray-300 hover:bg-gray-700'
-                  : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={confirmCompleteProject}
-                disabled={completeConfirmText !== 'complete-this-project' || processingProjectId === projectToComplete.id}
-                className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {processingProjectId === projectToComplete.id ? 'Completing...' : 'Complete Project'}
-              </button>
-            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
 
       {/* Create Project Modal */}
       <CreateProjectModal
@@ -923,7 +1010,7 @@ const ProjectsPage: React.FC = () => {
             <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               To delete this project, please confirm by entering the following:
             </p>
-            
+
             <div className="space-y-4">
               {/* Project Name Display */}
               <div>

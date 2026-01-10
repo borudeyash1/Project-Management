@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import passport from 'passport';
 import path from 'path';
 import disconnectModulesRoutes from "./routes/disconnect-modules";
+import { apiLimiter, authLimiter, resourceLimiter, securityHeaders, auditUnauthorizedAccess } from './middleware/security';
 
 // Routes
 import authRoutes from "./routes/auth";
@@ -76,6 +77,7 @@ import paymentRoutes from "./routes/payment.routes"; // [NEW] Payment Routes
 import { ensureDefaultSubscriptionPlans } from "./data/subscriptionPlans";
 import { initializeSartthiServices } from "./services/sartthi/sartthiConfig";
 import { initializeSocket } from "./socket/chatSocket"; // [NEW] Socket.IO
+import { initializeRealtimeSocket } from "./socket/realtimeSocket"; // Real-time updates
 import { createServer } from "http"; // [NEW] HTTP Server
 
 // Load environment variables
@@ -124,14 +126,22 @@ app.use(
   }),
 );
 
-// Rate limiting - Increased for testing
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10000, // Increased from 100 to 10000 for testing
-  message: "Too many requests from this IP, please try again later.",
-  skip: (req) => req.path.startsWith("/admin/subscriptions"),
-});
-app.use("/api/", limiter);
+// Security headers middleware
+app.use(securityHeaders);
+
+// Enhanced rate limiting with different tiers
+// General API rate limiting
+app.use("/api/", apiLimiter);
+
+// Stricter rate limiting for auth endpoints
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/forgot-password", authLimiter);
+
+// Resource-specific rate limiting (prevents ObjectID enumeration)
+app.use("/api/projects/:id", resourceLimiter);
+app.use("/api/workspaces/:id", resourceLimiter);
+app.use("/api/tasks/:id", resourceLimiter);
 
 // Logging
 app.use(morgan("combined"));
@@ -280,10 +290,15 @@ const server = app.listen(PORT, () => {
 // Setup Socket.IO for real-time chat
 const io = initializeSocket(server);
 
+// Setup Socket.IO for real-time notifications and updates
+const realtimeIO = initializeRealtimeSocket(server);
+
 // Make io available globally
 (global as any).io = io;
+(global as any).realtimeIO = realtimeIO;
 
 console.log("✅ Socket.IO initialized for chat system");
+console.log("✅ Real-time Socket.IO initialized for notifications & updates");
 
 // Increase timeout to 10 minutes for large file uploads
 server.setTimeout(10 * 60 * 1000);

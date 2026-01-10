@@ -32,6 +32,7 @@ import { useTheme } from '../context/ThemeContext';
 import { apiService } from '../services/api';
 import { useRefreshData } from '../hooks/useRefreshData';
 import { useNotionSync } from '../hooks/useNotionSync';
+import { useRealtime } from '../hooks/useRealtime'; // [NEW] Real-time hook
 import { useCallback } from 'react';
 
 interface Task {
@@ -291,6 +292,49 @@ const TaskManagement: React.FC = () => {
     },
     enabled: true
   });
+
+  // [NEW] General Real-time Sync (Socket.IO)
+  const { socket } = useRealtime();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleTaskCreated = (newTask: any) => {
+      console.log('⚡ [TASK BOARD] Task created:', newTask);
+      setTasks(prev => {
+        if (prev.some(t => t._id === newTask._id)) return prev;
+        return [...prev, newTask];
+      });
+      setToastMessage(`New task created: ${newTask.title}`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    };
+
+    const handleTaskUpdated = (data: { taskId: string, changes: any, updatedBy: string }) => {
+      console.log('⚡ [TASK BOARD] Task updated:', data.taskId);
+      setTasks(prev => prev.map(t => {
+        if (t._id === data.taskId) {
+          return { ...t, ...data.changes };
+        }
+        return t;
+      }));
+    };
+
+    const handleTaskDeleted = (data: { taskId: string }) => {
+      console.log('⚡ [TASK BOARD] Task deleted:', data.taskId);
+      setTasks(prev => prev.filter(t => t._id !== data.taskId));
+    };
+
+    socket.on('task:created', handleTaskCreated);
+    socket.on('task:updated', handleTaskUpdated);
+    socket.on('task:deleted', handleTaskDeleted);
+
+    return () => {
+      socket.off('task:created', handleTaskCreated);
+      socket.off('task:updated', handleTaskUpdated);
+      socket.off('task:deleted', handleTaskDeleted);
+    };
+  }, [socket]);
 
   // Column management functions
   const handleColumnUpdate = (columnId: string, updates: Partial<Column>) => {

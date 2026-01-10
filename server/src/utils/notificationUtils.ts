@@ -3,6 +3,7 @@ import User from '../models/User';
 import Task from '../models/Task';
 import Project from '../models/Project';
 import Workspace from '../models/Workspace';
+import { emitToUser } from '../socket/realtimeSocket';
 
 /**
  * Comprehensive Notification Utility for Task Management System
@@ -32,12 +33,22 @@ interface NotificationData {
 }
 
 /**
- * Create a notification
+ * Create a notification and emit real-time event
  */
 export async function createNotification(data: NotificationData): Promise<void> {
   try {
-    await Notification.create(data);
+    const notification = await Notification.create(data);
     console.log(`✅ [NOTIFICATION] Created: ${data.title} for user ${data.userId}`);
+
+    // Emit real-time notification to user
+    emitToUser(data.userId, 'notification:new', {
+      _id: notification._id,
+      ...data,
+      createdAt: notification.createdAt,
+      isRead: false
+    });
+
+    console.log(`📡 [REALTIME] Emitted notification:new to user ${data.userId}`);
   } catch (error) {
     console.error('❌ [NOTIFICATION] Failed to create notification:', error);
   }
@@ -67,7 +78,7 @@ export async function notifyTaskAssigned(
   try {
     const task: any = await Task.findById(taskId).populate('project');
     const assigner: any = await User.findById(assignedBy);
-    
+
     if (!task || !assigner) return;
 
     await createNotification({
@@ -103,7 +114,7 @@ export async function notifyTaskReassigned(
   try {
     const task: any = await Task.findById(taskId);
     const reassigner: any = await User.findById(reassignedBy);
-    
+
     if (!task || !reassigner) return;
 
     // Notify new assignee
@@ -156,7 +167,7 @@ export async function notifyTaskStatusChanged(
   try {
     const task: any = await Task.findById(taskId).populate('assignee reporter');
     const changer: any = await User.findById(changedBy);
-    
+
     if (!task || !changer) return;
 
     const statusMessages: Record<string, string> = {
@@ -231,7 +242,7 @@ export async function notifyTaskPriorityChanged(
   try {
     const task: any = await Task.findById(taskId).populate('assignee reporter');
     const changer: any = await User.findById(changedBy);
-    
+
     if (!task || !changer) return;
 
     const message = `${changer.fullName} changed priority of task "${task.title}" from ${oldPriority} to ${newPriority}`;
@@ -294,10 +305,10 @@ export async function notifyTaskDeadlineChanged(
   try {
     const task: any = await Task.findById(taskId).populate('assignee reporter');
     const changer: any = await User.findById(changedBy);
-    
+
     if (!task || !changer) return;
 
-    const formatDate = (date: Date | undefined) => 
+    const formatDate = (date: Date | undefined) =>
       date ? new Date(date).toLocaleDateString() : 'Not set';
 
     const message = `${changer.fullName} changed deadline of task "${task.title}" from ${formatDate(oldDeadline)} to ${formatDate(newDeadline)}`;
@@ -358,7 +369,7 @@ export async function notifyTaskCompleted(
   try {
     const task: any = await Task.findById(taskId).populate('assignee reporter project');
     const completer: any = await User.findById(completedBy);
-    
+
     if (!task || !completer) return;
 
     const message = `${completer.fullName} completed task "${task.title}"`;
@@ -385,10 +396,10 @@ export async function notifyTaskCompleted(
     if (task.project) {
       const project: any = await Project.findById(task.project._id);
       if (project) {
-        const managers = project.members.filter((m: any) => 
+        const managers = project.members.filter((m: any) =>
           m.role === 'manager' && m.user.toString() !== completedBy
         );
-        
+
         for (const manager of managers) {
           await createNotification({
             type: 'task',
@@ -422,7 +433,7 @@ export async function notifyTaskVerified(
   try {
     const task: any = await Task.findById(taskId).populate('assignee');
     const verifier: any = await User.findById(verifiedBy);
-    
+
     if (!task || !verifier) return;
 
     // Notify assignee
@@ -458,7 +469,7 @@ export async function notifyTaskComment(
   try {
     const task: any = await Task.findById(taskId).populate('assignee reporter');
     const author: any = await User.findById(commentAuthorId);
-    
+
     if (!task || !author) return;
 
     const message = `${author.fullName} commented on task "${task.title}": ${commentContent.substring(0, 100)}${commentContent.length > 100 ? '...' : ''}`;
@@ -520,7 +531,7 @@ export async function notifyTaskDeleted(
 ): Promise<void> {
   try {
     const deleter: any = await User.findById(deletedBy);
-    
+
     if (!deleter) return;
 
     // Notify assignee
@@ -554,7 +565,7 @@ export async function notifyTaskFileUploaded(
   try {
     const task: any = await Task.findById(taskId).populate('assignee reporter');
     const uploader: any = await User.findById(uploadedBy);
-    
+
     if (!task || !uploader) return;
 
     const message = `${uploader.fullName} uploaded a file "${fileName}" to task "${task.title}"`;
@@ -614,7 +625,7 @@ export async function notifySubtaskCompleted(
   try {
     const task: any = await Task.findById(taskId).populate('assignee reporter');
     const completer: any = await User.findById(completedBy);
-    
+
     if (!task || !completer) return;
 
     const message = `${completer.fullName} completed subtask "${subtaskTitle}" in task "${task.title}"`;
@@ -675,7 +686,7 @@ export async function notifyTaskMention(
   try {
     const task: any = await Task.findById(taskId);
     const mentioner: any = await User.findById(mentionedBy);
-    
+
     if (!task || !mentioner) return;
 
     await createNotification({
@@ -703,7 +714,7 @@ export async function notifyTaskMention(
 export async function notifyTaskOverdue(taskId: string): Promise<void> {
   try {
     const task: any = await Task.findById(taskId).populate('assignee reporter');
-    
+
     if (!task) return;
 
     const message = `Task "${task.title}" is overdue!`;
@@ -758,14 +769,14 @@ export async function notifyInboxMessage(
   try {
     const sender: any = await User.findById(senderId);
     const workspace: any = await Workspace.findById(workspaceId);
-    
+
     if (!sender || !workspace) return;
 
     // Don't notify the sender
     if (senderId === recipientId) return;
 
-    const truncatedMessage = messageContent.length > 100 
-      ? messageContent.substring(0, 100) + '...' 
+    const truncatedMessage = messageContent.length > 100
+      ? messageContent.substring(0, 100) + '...'
       : messageContent;
 
     await createNotification({

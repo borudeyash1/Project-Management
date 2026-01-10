@@ -9,6 +9,7 @@ import { ContextAIButton } from '../ai/ContextAIButton';
 import { getProjects as getWorkspaceProjects, createProject } from '../../services/projectService';
 import WorkspaceCreateProjectModal from '../WorkspaceCreateProjectModal';
 import { apiService } from '../../services/api';
+import { useRealtime } from '../../hooks/useRealtime';
 import { format } from 'date-fns';
 import {
   FolderKanban,
@@ -53,6 +54,8 @@ const WorkspaceOverview: React.FC = () => {
   const [recentTasks, setRecentTasks] = useState<any[]>([]);
   const [loadingTasks, setLoadingTasks] = useState(true);
   const hasFetchedRef = React.useRef(false);
+  const { socket, isConnected } = useRealtime();
+  const [dataVersion, setDataVersion] = useState(0);
 
   const currentWorkspace = state.workspaces.find(w => w._id === state.currentWorkspace);
   const workspaceProjects = state.projects.filter(
@@ -93,16 +96,47 @@ const WorkspaceOverview: React.FC = () => {
     fetchAttendance();
   }, [state.currentWorkspace]);
 
+  // Subscribe to real-time events
+  useEffect(() => {
+    if (!socket || !isConnected || !state.currentWorkspace) return;
+
+    socket.emit('subscribe:workspace', state.currentWorkspace);
+
+    const handleRefresh = () => {
+      console.log('[WorkspaceOverview] Real-time update received, refreshing data...');
+      setDataVersion(v => v + 1);
+      hasFetchedRef.current = false; // Allow re-fetch
+    };
+
+    socket.on('project:created', handleRefresh);
+    socket.on('project:updated', handleRefresh);
+    socket.on('project:deleted', handleRefresh);
+    socket.on('workspace:updated', handleRefresh);
+    socket.on('workspace:member_added', handleRefresh);
+    socket.on('workspace:member_removed', handleRefresh);
+
+    return () => {
+      socket.emit('unsubscribe:workspace', state.currentWorkspace);
+      socket.off('project:created', handleRefresh);
+      socket.off('project:updated', handleRefresh);
+      socket.off('project:deleted', handleRefresh);
+      socket.off('workspace:updated', handleRefresh);
+      socket.off('workspace:member_added', handleRefresh);
+      socket.off('workspace:member_removed', handleRefresh);
+    };
+  }, [socket, isConnected, state.currentWorkspace]);
+
   // Fetch workspace projects from backend to ensure data is synced
   useEffect(() => {
     const loadWorkspaceProjects = async () => {
-      if (!state.currentWorkspace || hasFetchedRef.current) return;
+      if (!state.currentWorkspace) return;
+      if (hasFetchedRef.current && dataVersion === 0) return; // Skip if already fetched and no update
 
       try {
         hasFetchedRef.current = true; // Mark as fetched immediately
         setLoadingProjects(true);
         setLoadingTasks(true);
-        
+
         console.log('[WorkspaceOverview] Fetching projects for workspace:', state.currentWorkspace);
         const projects = await getWorkspaceProjects(state.currentWorkspace);
         console.log('[WorkspaceOverview] Fetched projects:', projects.length);
@@ -113,14 +147,14 @@ const WorkspaceOverview: React.FC = () => {
             try {
               const tasksResponse = await apiService.get(`/tasks?projectId=${project._id}`);
               const tasks = tasksResponse.success ? (tasksResponse.data || []) : [];
-              
+
               const totalTasksCount = tasks.length;
-              const completedTasksCount = tasks.filter((t: any) => 
+              const completedTasksCount = tasks.filter((t: any) =>
                 t.status === 'completed' || t.status === 'done'
               ).length;
-              
+
               const teamMemberCount = project.teamMembers?.length || project.team?.length || 0;
-              
+
               return {
                 ...project,
                 totalTasksCount,
@@ -145,7 +179,7 @@ const WorkspaceOverview: React.FC = () => {
 
         // Update the projects in state
         dispatch({ type: 'SET_PROJECTS', payload: projectsWithCounts });
-        
+
         // Extract recent tasks from all projects
         const allTasks: any[] = [];
         projectsWithCounts.forEach((project: any) => {
@@ -157,7 +191,7 @@ const WorkspaceOverview: React.FC = () => {
             allTasks.push(...projectTasks);
           }
         });
-        
+
         // Filter pending/in-progress tasks and sort by due date
         const pendingTasks = allTasks
           .filter(t => t.status !== 'completed' && t.status !== 'done')
@@ -167,7 +201,7 @@ const WorkspaceOverview: React.FC = () => {
             return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
           })
           .slice(0, 5);
-        
+
         setRecentTasks(pendingTasks);
         setLoadingTasks(false);
       } catch (error) {
@@ -179,7 +213,8 @@ const WorkspaceOverview: React.FC = () => {
     };
 
     loadWorkspaceProjects();
-  }, [state.currentWorkspace, dispatch]);
+    loadWorkspaceProjects();
+  }, [state.currentWorkspace, dispatch, dataVersion]);
 
   const isOwner = currentWorkspace?.owner === state.userProfile._id;
 
@@ -375,11 +410,10 @@ const WorkspaceOverview: React.FC = () => {
                         <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">
                           {project.name}
                         </h4>
-                        <span className={`px-2 py-0.5 text-xs rounded-full ${
-                          project.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${project.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
                           project.status === 'completed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                          'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
-                        }`}>
+                            'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
+                          }`}>
                           {project.status}
                         </span>
                       </div>
@@ -464,11 +498,10 @@ const WorkspaceOverview: React.FC = () => {
                   className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer border border-gray-200 dark:border-gray-700"
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                      task.priority === 'high' || task.priority === 'urgent' ? 'bg-red-500' :
+                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${task.priority === 'high' || task.priority === 'urgent' ? 'bg-red-500' :
                       task.priority === 'medium' ? 'bg-yellow-500' :
-                      'bg-blue-500'
-                    }`} />
+                        'bg-blue-500'
+                      }`} />
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">
                         {task.title}
@@ -480,19 +513,17 @@ const WorkspaceOverview: React.FC = () => {
                         {task.dueDate && (
                           <>
                             <span className="text-xs text-gray-400">•</span>
-                            <span className={`text-xs ${
-                              new Date(task.dueDate) < new Date() ? 'text-red-600' : 'text-gray-500'
-                            }`}>
+                            <span className={`text-xs ${new Date(task.dueDate) < new Date() ? 'text-red-600' : 'text-gray-500'
+                              }`}>
                               {new Date(task.dueDate).toLocaleDateString()}
                             </span>
                           </>
                         )}
                       </div>
                     </div>
-                    <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ${
-                      task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                    <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ${task.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
                       'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'
-                    }`}>
+                      }`}>
                       {task.status}
                     </span>
                   </div>

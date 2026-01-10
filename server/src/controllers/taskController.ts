@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { emitToRoom } from '../socket/realtimeSocket';
 import Task from '../models/Task';
 import Project from '../models/Project';
 import { ApiResponse } from '../types';
@@ -391,6 +392,18 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
       data: task,
     };
 
+    // [NEW] Emit real-time creation
+    if (task.project) {
+      emitToRoom(`project:${task.project}`, 'task:created', task);
+    }
+    // Also emit to assignee if they exist (for global task board)
+    if (task.assignee) {
+      const assigneeId = typeof task.assignee === 'object' ? (task.assignee as any)._id : task.assignee;
+      if (assigneeId) {
+        emitToRoom(`user:${assigneeId}`, 'task:created', task);
+      }
+    }
+
     res.status(201).json(response);
   } catch (error: any) {
     console.error('Create task error:', error);
@@ -499,7 +512,7 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     // Notify verification
     if (verifiedBy !== undefined && task.status === 'verified') {
       await notifyTaskVerified(taskId, userId);
-      
+
       // Update user performance ratings
       if (task.assignee && task.ratingDetails) {
         try {
@@ -657,6 +670,26 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
       data: task,
     };
 
+    // [NEW] Emit real-time update
+    if (task.project) {
+      emitToRoom(`project:${task.project}`, 'task:updated', {
+        taskId: task._id,
+        changes: req.body,
+        updatedBy: authUser._id
+      });
+    }
+    // Also emit to assignee (for global task board)
+    if (task.assignee) {
+      const assigneeId = typeof task.assignee === 'object' ? (task.assignee as any)._id : task.assignee;
+      if (assigneeId) {
+        emitToRoom(`user:${assigneeId}`, 'task:updated', {
+          taskId: task._id,
+          changes: req.body,
+          updatedBy: authUser._id
+        });
+      }
+    }
+
     res.status(200).json(response);
   } catch (error: any) {
     console.error('Update task error:', error);
@@ -694,6 +727,15 @@ export const deleteTask = async (req: Request, res: Response): Promise<void> => 
       success: true,
       message: 'Task deleted successfully',
     };
+
+    // [NEW] Emit real-time delete
+    if (task.project) {
+      emitToRoom(`project:${task.project}`, 'task:deleted', { taskId: task._id });
+    }
+    // Also emit to assignee
+    if (assigneeId) {
+      emitToRoom(`user:${assigneeId}`, 'task:deleted', { taskId: task._id });
+    }
 
     res.status(200).json(response);
   } catch (error: any) {

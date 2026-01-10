@@ -28,6 +28,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useDock } from '../context/DockContext';
 import { useTranslation } from 'react-i18next';
 import apiService from '../services/api';
+import { useRealtime } from '../hooks/useRealtime'; // [NEW] Real-time hook
 
 import AddTeamMemberModal from './AddTeamMemberModal';
 import InviteMemberModal from './InviteMemberModal';
@@ -243,6 +244,101 @@ const ProjectViewDetailed: React.FC = () => {
   const [requests, setRequests] = useState<any[]>([]); // Workload/deadline requests
   const [projectTasks, setProjectTasks] = useState<any[]>([]); // Tasks for assignment (loaded from backend)
 
+  // Real-time integration
+  const { socket } = useRealtime();
+
+  useEffect(() => {
+    if (!projectId || !socket) return;
+
+    // Join project room
+    socket.emit('subscribe:project', projectId);
+
+    // Listen for project updates
+    const handleProjectUpdate = (data: { projectId: string, changes: any, updatedBy: string }) => {
+      if (data.projectId === projectId) {
+        console.log('⚡ [REALTIME] Project updated:', data.changes);
+        setActiveProject(prev => {
+          if (!prev) return null;
+          return { ...prev, ...data.changes };
+        });
+
+        // Update local stats if budget/status changed
+        if (data.changes.budget !== undefined) setProjectBudget(data.changes.budget.amount || data.changes.budget);
+        if (data.changes.status !== undefined) setProjectStatus(data.changes.status);
+        if (data.changes.progress !== undefined) setProjectProgress(data.changes.progress);
+
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'info',
+            message: 'Project details updated by another user',
+            duration: 3000
+          }
+        });
+      }
+    };
+
+    const handleProjectDelete = (data: { projectId: string, deletedBy: string }) => {
+      if (data.projectId === projectId) {
+        dispatch({
+          type: 'ADD_TOAST',
+          payload: {
+            id: Date.now().toString(),
+            type: 'warning',
+            message: 'This project has been deleted.',
+            duration: 5000
+          }
+        });
+        // Redirect after a moment
+        setTimeout(() => navigate('/projects'), 2000);
+      }
+    };
+
+    // Listen for task updates (simple refresh of list for now, or surgical update)
+    const handleTaskCreated = (newTask: any) => {
+      console.log('⚡ [REALTIME] Task created:', newTask);
+      // Transform to UI format and add
+      setProjectTasks(prev => {
+        // Avoid adding duplicate if we just created it
+        if (prev.some(t => t._id === newTask._id)) return prev;
+        const uiTask = mapBackendTaskToUi(newTask, (activeProject as any)?.team || []);
+        return [...prev, uiTask];
+      });
+    };
+
+    const handleTaskUpdated = (data: { taskId: string, changes: any, updatedBy: string }) => {
+      console.log('⚡ [REALTIME] Task updated:', data.taskId);
+      setProjectTasks(prev => prev.map(t => {
+        if (t._id === data.taskId) {
+          // Merge changes carefully
+          return { ...t, ...data.changes };
+        }
+        return t;
+      }));
+    };
+
+    const handleTaskDeleted = (data: { taskId: string }) => {
+      console.log('⚡ [REALTIME] Task deleted:', data.taskId);
+      setProjectTasks(prev => prev.filter(t => t._id !== data.taskId));
+    };
+
+    socket.on('project:updated', handleProjectUpdate);
+    socket.on('project:deleted', handleProjectDelete);
+    socket.on('task:created', handleTaskCreated);
+    socket.on('task:updated', handleTaskUpdated);
+    socket.on('task:deleted', handleTaskDeleted);
+
+    return () => {
+      socket.emit('unsubscribe:project', projectId);
+      socket.off('project:updated', handleProjectUpdate);
+      socket.off('project:deleted', handleProjectDelete);
+      socket.off('task:created', handleTaskCreated);
+      socket.off('task:updated', handleTaskUpdated);
+      socket.off('task:deleted', handleTaskDeleted);
+    };
+  }, [projectId, socket, activeProject]); // activeProject dependency needed for mapBackendTaskToUi context
+
   // Project Settings State
   const [officeLatitude, setOfficeLatitude] = useState('');
   const [officeLongitude, setOfficeLongitude] = useState('');
@@ -380,19 +476,19 @@ const ProjectViewDetailed: React.FC = () => {
   // Initialize budget and spent from active project
   useEffect(() => {
     if (activeProject) {
-      const budgetAmount = typeof activeProject.budget === 'object' && activeProject.budget 
-        ? ((activeProject.budget as any).amount || 0) 
+      const budgetAmount = typeof activeProject.budget === 'object' && activeProject.budget
+        ? ((activeProject.budget as any).amount || 0)
         : (typeof activeProject.budget === 'number' ? activeProject.budget : 0);
-      
-      const spentAmount = typeof activeProject.budget === 'object' && activeProject.budget 
-        ? ((activeProject.budget as any).spent || 0) 
+
+      const spentAmount = typeof activeProject.budget === 'object' && activeProject.budget
+        ? ((activeProject.budget as any).spent || 0)
         : ((activeProject as any).spent || 0);
-      
+
       setProjectBudget(budgetAmount);
       setProjectSpent(spentAmount);
       setProjectProgress(activeProject.progress || 0);
       setProjectStatus(activeProject.status || 'active');
-      
+
       // Initialize office location if available
       if ((activeProject as any).officeLocation) {
         setOfficeLatitude((activeProject as any).officeLocation.latitude?.toString() || '');
@@ -404,7 +500,7 @@ const ProjectViewDetailed: React.FC = () => {
   // Helper to map backend Task to UI task shape used in tabs
   const mapBackendTaskToUi = (task: any, team: any[]): any => {
     const assigneeId = task.assignee?._id || task.assignee || '';
-    
+
     // Find the team member - handle both populated and unpopulated user objects
     const assigneeMember = team?.find((m: any) => {
       const memberId = typeof m.user === 'object' ? m.user._id : m.user;
@@ -467,7 +563,7 @@ const ProjectViewDetailed: React.FC = () => {
           mapBackendTaskToUi(t, (activeProject as any)?.team || []),
         );
         setProjectTasks(uiTasks);
-        
+
         // Update activeProject with loaded tasks
         if (activeProject) {
           setActiveProject({
@@ -2793,13 +2889,12 @@ const ProjectViewDetailed: React.FC = () => {
                 </div>
                 <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div
-                    className={`h-full transition-all duration-300 ${
-                      projectBudget > 0 && (projectSpent / projectBudget) > 0.9
-                        ? 'bg-red-500'
-                        : projectBudget > 0 && (projectSpent / projectBudget) > 0.75
+                    className={`h-full transition-all duration-300 ${projectBudget > 0 && (projectSpent / projectBudget) > 0.9
+                      ? 'bg-red-500'
+                      : projectBudget > 0 && (projectSpent / projectBudget) > 0.75
                         ? 'bg-yellow-500'
                         : 'bg-green-500'
-                    }`}
+                      }`}
                     style={{ width: `${projectBudget > 0 ? Math.min((projectSpent / projectBudget) * 100, 100) : 0}%` }}
                   />
                 </div>
